@@ -1,4 +1,5 @@
 import re
+import datetime
 
 class RaketeBuildString:
     def __init__(self):
@@ -63,6 +64,10 @@ class RaketeBuildString:
                 string = str(value_dict[inside])
                 replacements[outside] = string
                 continue
+
+            if inside.startswith("date:"):
+                date_format = inside[5:]
+                replacements[outside] = datetime.datetime.now().strftime(date_format)
 
             inside_parts = inside.split(".")
             node_key = inside_parts[0]
