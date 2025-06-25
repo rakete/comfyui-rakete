@@ -37,7 +37,7 @@ class RaketeGetWidgetValue:
 
     @classmethod
     def IS_CHANGED(s, **kwargs):
-        return True
+        return float("NaN")
 
     def get_widget_value_string(self, node_name_for_sr, widget_name, default_value, num_decimals, extra_pnginfo, prompt):
         workflow = extra_pnginfo["workflow"]
@@ -54,9 +54,14 @@ class RaketeGetWidgetValue:
             values = prompt[str(node_id)]
             if "inputs" in values and widget_name in values["inputs"]:
                 value = values["inputs"][widget_name]
-                if isinstance(value, float) and num_decimals >= 0:
-                    string = f"{value:.{num_decimals}f}"
-                else:
+                try:
+                    float_value = float(value)
+                    if num_decimals >= 0:
+                        print("converted to float:", float_value)
+                        string = f"{float_value:.{num_decimals}f}"
+                    else:
+                        string = str(float_value)
+                except ValueError:
                     string = str(value)
 
         return (string,)
