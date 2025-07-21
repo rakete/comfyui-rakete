@@ -1,0 +1,17 @@
+# pyproject.tom
+[project]
+name = "ComfyUI-Rakete"
+description = "Rakete Comfy Custom Nodes."
+version = "1.0.0"
+
+license = {text = "MIT"}
+dependencies  = [
+    "torch>=2.7.1",
+]
+[project.urls]
+Repository = "https://github.com/rakete/comfyui-rakete"
+
+[tool.comfy]
+PublisherId = "rakete"
+DisplayName = "Rakete Nodes"
+Icon = ""
