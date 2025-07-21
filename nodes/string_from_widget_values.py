@@ -45,7 +45,9 @@ class RaketeBuildString:
         workflow = extra_pnginfo["workflow"]
 
         node_dict = {}
+        nodes_by_id = {}
         for node in workflow["nodes"]:
+            nodes_by_id[node["id"]] = node
             if "properties" in node and "Node name for S&R" in node["properties"]:
                 key = node["properties"]["Node name for S&R"]
                 if key:
@@ -76,21 +78,37 @@ class RaketeBuildString:
 
             node_id = node_dict[node_key]["id"]
             widget_name = inside_parts[1]
+            widget_ix = -1
             string = default_value
             if str(node_id) in prompt:
-                values = prompt[str(node_id)]
-                if "inputs" in values and widget_name in values["inputs"]:
-                    value = values["inputs"][widget_name]
-                    #print("value type:", node_key, widget_name, type(value))
-                    try:
-                        float_value = float(value)
-                        if num_decimals >= 0:
-                            #print("converted to float:", float_value)
-                            string = f"{float_value:.{num_decimals}f}"
+                #print("=====")
+                while node_id is not None:
+                    values = prompt[str(node_id)]
+                    #print("node_id", node_id, values, widget_name)
+                    if "inputs" in values and (widget_name in values["inputs"] or widget_ix >= 0):
+                        if widget_ix >= 0:
+                            values_list = list(values["inputs"].values())
+                            value = values_list[widget_ix]
                         else:
-                            string = str(float_value)
-                    except ValueError:
-                        string = str(value)
+                            value = values["inputs"][widget_name]
+
+                        #print("value", value)
+                        if isinstance(value, list):
+                            #print("list", value)
+                            node_id = int(value[0])
+                            widget_ix = value[1]
+                            continue
+
+                        try:
+                            float_value = float(value)
+                            if num_decimals >= 0:
+                                #print("converted to float:", float_value)
+                                string = f"{float_value:.{num_decimals}f}"
+                            else:
+                                string = str(float_value)
+                        except ValueError:
+                            string = str(value)
+                    break
 
             replacements[outside] = string
 
